@@ -53,9 +53,13 @@ class Trim():
         self.theta = self.alpha + self.gamma
 
     def getAngularRates(self):
-        self.p = -self.Va/self.R*np.cos(self.theta)
+
+        self.p = -self.Va/self.R*np.sin(self.theta)
         self.q = self.Va/self.R*np.sin(self.phi)*np.cos(self.theta)
-        self.r = self.Va/self.R*np.cos(phi)*np.cos(self.theta)
+        self.r = self.Va/self.R*np.cos(self.phi)*np.cos(self.theta)
+        # print('p %5.4e' % self.p)
+
+
 
     def getElevator(self):
         # The code is broken down into several steps to increase readability
@@ -77,10 +81,11 @@ class Trim():
         matrix1 = np.matrix([[P.C_p_delta_a, P.C_p_delta_r], [P.C_r_delta_a, P.C_r_delta_r]])
         matrix1 = linalg.inv(matrix1)
 
-        temp1 = (-P.Gamma1*self.p*self.q + P.Gamma2*self.q*self.r)/(1/2*P.rho*self.Va**2*P.S*P.b)
+
+        temp1 = (-P.Gamma1*self.p*self.q + P.Gamma2*self.q*self.r)/(0.5*P.rho*self.Va**2*P.S*P.b)
         temp2 = P.C_p_p*(P.b*self.p/(2*self.Va))
         temp3 = P.C_p_r*(P.b*self.r/(2*self.Va))
-        temp4 = (-P.Gamma7*self.p*self.q + P.Gamma1*self.q*self.r)/(1/2*P.rho*self.Va**2*P.S*P.b)
+        temp4 = (-P.Gamma7*self.p*self.q + P.Gamma1*self.q*self.r)/(0.5*P.rho*self.Va**2*P.S*P.b)
         temp5 = P.C_r_p*(P.b*self.p/(2*self.Va))
         temp6 = P.C_r_r*(P.b*self.r/(2*self.Va))
 
@@ -99,17 +104,19 @@ class Trim():
         self.sigma = numerator/den
 
     def getLiftModelCoeff(self):
-        self.C_L =  (1-self.sigma)*(P.C_L_0 + P.C_L_alpha*self.alpha),
-        +self.sigma*(2*np.sign(self.alpha)*np.sin(self.alpha)**2*np.cos(self.alpha))
+        self.C_L =  (1-self.sigma)*(P.C_L_0 + P.C_L_alpha*self.alpha) + \
+        self.sigma*(2*np.sign(self.alpha)*np.sin(self.alpha)**2*np.cos(self.alpha))
 
     def getDragModelCoeff(self):
         AR = P.b**2/P.S
         self.C_D =P.C_D_p + (P.C_L_0 + P.C_L_alpha*self.alpha)**2/(np.pi*P.e*AR)
 
     def getLiftCoeff(self):
-        self.getSigma
-        self.getLiftModelCoeff
-        self.getDragModelCoeff
+        self.getSigma()
+        self.getLiftModelCoeff()
+        self.getDragModelCoeff()
+
+
 
         self.C_X =           -self.C_D*np.cos(self.alpha)  +          self.C_L*np.sin(self.alpha)
         self.C_X_q =         -P.C_D_q*np.cos(self.alpha) +            P.C_L_q*np.sin(self.alpha)
@@ -118,8 +125,18 @@ class Trim():
         self.C_Z_q =         -P.C_D_q*np.sin(self.alpha)-             P.C_L_q*np.cos(self.alpha)
         self.C_Z_delta_e =   -P.C_D_delta_e*np.sin(self.alpha) -      P.C_L_delta_e*np.cos(self.alpha)
 
+        # print('Sigma %5.4e' % self.sigma)
+        # print('CL', self.C_L)
+        # print('CD', self.C_D)
+        # print( 'C_X', self.C_X)
+        # print('C_X_q ', self.C_X_q)
+        # print('C_X_delta_e', self.C_X_delta_e)
+        # print( 'C_Z', self.C_Z)
+        # print('C_Z_q ', self.C_Z_q)
+        # print('C_Z_delta_e', self.C_Z_delta_e)
+
     def computeTrim(self):
-        self.getLiftModelCoeff()
+        self.getLiftCoeff()
         self.getBodyFrameVelocities()
         self.getPitchAngle()
         self.getAngularRates()
@@ -154,14 +171,17 @@ class Trim():
 if __name__ == "__main__": 
     # Va,gamma,R,alpha,beta,phi
     Va = float(35)
-    gamma = float(0*np.pi/180)
-    R = float('inf')
-    alpha = np.arctan(2.5632/34.9060)  # atan(wr/ur)
-    beta = 3.9e-37/Va                         # vr/Va
-    phi = -6.3294e-23
+    gamma = float(60*np.pi/180)
+    # R = float('inf')
+    alpha = -0.0018  # atan(wr/ur)
+    beta = 3.9160e-29 #np.arcsin(-5.60228271932687e-27/Va)                         # vr/Va
+    R = 500
+    phi = np.arctan(Va**2*np.cos(gamma)/(R*P.g))
 
     T = Trim(Va,gamma,R,alpha,beta,phi)
     T.computeTrim()
     T.printValues()
+    print('R', R)
+
 
 

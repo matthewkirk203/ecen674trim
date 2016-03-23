@@ -1,13 +1,13 @@
 import numpy as np
 
 # Basic Parameters
-g = 9.81               # gravity, m/s
+g = 9.8              # gravity, m/s
 
 
 # Aerodynamic coefficients
 
 # Parameters
-m       = 13.5          # mass, kg
+m       = 25#13.5          # mass, kg
 Jx      = 0.8244        # Component of Inertia matrix, kg-m**2
 Jy      = 1.135         # Component of Inertia matrix, kg-m**2
 Jz      = 1.759         # Component of Inertia matrix, kg-m**2

@@ -21,6 +21,7 @@ class Trim():
 
         # Pitch angle
         self.theta = 0.0    # units rad
+        self.psi = 0.0
 
         # Angular rates
         self.p = 0.0        # Roll rate along x-axis, rad/s
@@ -43,6 +44,20 @@ class Trim():
         self.Z = 0.0
         self.Z_q = 0.0
         self.Z_delta_e = 0.0
+
+        # fx
+        self.pndot = 0.0
+        self.pedot = 0.0
+        self.hdot = 0.0
+        self.udot = 0.0
+        self.vdot = 0.0
+        self.wdot = 0.0
+        self.phidot = 0.0
+        self.thetadot = 0.0
+        self.psidot = 0.0
+        self.pdot = 0.0
+        self.qdot = 0.0
+        self.rdot = 0.0
 
     def getBodyFrameVelocities(self):
         self.u = self.Va*np.cos(self.alpha)*np.cos(self.beta)
@@ -135,7 +150,7 @@ class Trim():
         # print('C_Z_q ', self.C_Z_q)
         # print('C_Z_delta_e', self.C_Z_delta_e)
 
-    def computeTrim(self):
+    def compute_X_Trim_U_Trim(self):
         self.getLiftCoeff()
         self.getBodyFrameVelocities()
         self.getPitchAngle()
@@ -145,7 +160,7 @@ class Trim():
         self.getAileronAndRudder()
 
     def printValues(self):
-        print('x trim')
+        print('\n\n x trim')
         print('pn')
         print('pe')
         print('pd')
@@ -159,11 +174,76 @@ class Trim():
         print('q',self.q)
         print('r',self.r)
 
-        print('u trim')
+        print('\n\n u trim')
         print('delta e', self.delta_e)
         print('delta t', self.delta_t)
         print('delta a', self.delta_a)
         print('delta r', self.delta_r)
+
+        print('\n\n xhatdot')
+        print('pndot', self.pndot)
+        print('pedot', self.pedot)
+        print('hdot', self.hdot)
+        print('udot', self.udot)
+        print('vdot', self.vdot)
+        print('wdot', self.wdot)
+        print('phidot', self.phidot)
+        print('thetadot', self.thetadot)
+        print('psidot', self.psidot)
+        print('pdot', self.pdot)
+        print('qdot', self.qdot)
+        print('rdot', self.rdot)
+
+    def get_f_x_u(self):
+        # Calculates xhatdot
+
+        cos_phi = np.cos(self.phi)
+        cos_theta = np.cos(self.theta)
+        cos_psi = np.cos(self.psi)
+        sin_phi = np.sin(self.phi)
+        sin_theta = np.sin(self.theta)
+        sin_psi = np.sin(self.psi)
+
+        temp1 = P.rho*Va**2*P.S/(2*P.m)
+
+        self.pndot = (cos_theta*cos_psi*self.u + (sin_phi*sin_theta*cos_psi - 
+            cos_phi*sin_psi)*self.v + (cos_phi*sin_theta*cos_psi + 
+            sin_phi*sin_psi)*self.w)
+
+        self.pedot = (cos_theta*cos_psi*self.u + (sin_phi*sin_theta*sin_psi +
+            cos_phi*cos_psi)*self.v + (cos_phi*sin_theta*sin_psi - 
+            sin_phi*cos_psi)*self.w)
+
+        self.hdot = (self.u*sin_theta - self.v*sin_phi*cos_theta -
+            self.w*cos_phi*cos_theta)
+
+        self.udot = (self.r*self.v - self.q*self.w - P.g*sin_theta + 
+            temp1*(self.C_X + self.C_X_q*P.c*self.q/(2*self.Va) + self.C_X_delta_e*self.delta_e) +
+            P.rho*P.Sprop*P.Cprop/(2*P.m)*((P.kmotor*self.delta_t)**2 - self.Va**2))
+
+        self.vdot = (self.p*self.w - self.r*self.u + P.g*cos_theta*sin_phi + temp1*
+            (P.C_Y_0 + P.C_Y_beta*self.beta + P.C_Y_p*P.b*self.p/(2*self.Va) + P.C_Y_r*P.b*self.r/(2*self.Va) +
+             P.C_Y_delta_a*self.delta_a + P.C_Y_delta_r*self.delta_r))
+
+        self.wdot = (self.q*self.u - self.p*self.v + P.g*cos_theta*cos_phi + temp1*(self.C_Z + 
+            self.C_Z_q*P.c*self.q/(2*self.Va) + self.C_Z_delta_e*self.delta_e))
+
+        self.phidot = self.p + self.q*sin_phi*np.tan(self.theta) + self.r*cos_phi*np.tan(self.theta)
+
+        self.thetadot = self.q*cos_phi - self.r*sin_phi
+
+        self.psidot = self.q*sin_phi*(1/cos_theta) + self.r*cos_phi*(1/cos_theta)
+
+        self.pdot = (P.Gamma1*self.p*self.q - P.Gamma2*self.q*self.r + (1/2)*P.rho*self.Va**2*P.S*P.b*
+            (P.C_p_0 + P.C_p_beta*self.beta + P.C_p_p*P.b*self.p/(2*self.Va) + P.C_p_r*P.b*self.r/(2*self.Va) +
+             P.C_p_delta_a*self.delta_a + P.C_p_delta_r*self.delta_r))
+
+        self.qdot = (P.Gamma5*self.p*self.r - P.Gamma6*(self.p**2 - self.r**2) + P.rho*self.Va**2*P.S*P.c/(2*P.Jy)*
+            (P.C_m_0 + P.C_m_alpha*self.alpha + P.C_m_q*P.c*self.q/(2*self.Va) + P.C_m_delta_e*self.delta_e))
+
+        self.rdot = (P.Gamma7*self.p*self.q - P.Gamma1*self.q*self.r + (1/2)*P.rho*self.Va**2*P.S*P.b*
+            (P.C_r_0 + P.C_r_beta*self.beta + P.C_r_p*P.b*self.p/(2*self.Va) + P.C_r_r*P.b*self.r/(2*self.Va) +
+            P.C_r_delta_a*self.delta_a + P.C_r_delta_r*self.delta_r))
 
 
 
@@ -171,15 +251,16 @@ class Trim():
 if __name__ == "__main__": 
     # Va,gamma,R,alpha,beta,phi
     Va = float(35)
-    gamma = float(60*np.pi/180)
+    gamma = float(0*np.pi/180)
     # R = float('inf')
-    alpha = -0.0018  # atan(wr/ur)
-    beta = 3.9160e-29 #np.arcsin(-5.60228271932687e-27/Va)                         # vr/Va
-    R = 500
+    alpha = 0.0733  # atan(wr/ur)
+    beta = -1.8035e-29 #np.arcsin(-5.60228271932687e-27/Va)                         # vr/Va
+    R = float('inf')
     phi = np.arctan(Va**2*np.cos(gamma)/(R*P.g))
 
     T = Trim(Va,gamma,R,alpha,beta,phi)
-    T.computeTrim()
+    T.compute_X_Trim_U_Trim()
+    T.get_f_x_u()
     T.printValues()
     print('R', R)
 

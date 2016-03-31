@@ -90,6 +90,8 @@ C_r_r = Gamma4*C_ell_r + Gamma8*C_n_r
 C_r_delta_a = Gamma4*C_ell_delta_a + Gamma8*C_n_delta_a
 C_r_delta_r = Gamma4*C_ell_delta_r + Gamma8*C_n_delta_r
 
+
+# I have verified the params file
 if __name__ == "__main__": 
     print('Gamma', Gamma)
     print('Gamma1', Gamma1)

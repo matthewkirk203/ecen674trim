@@ -1,0 +1,2 @@
+set(fcu_common_MESSAGE_FILES "/home/matt/ecen674trim/catkin_ws/src/fcu_common/msg/GPS.msg;/home/matt/ecen674trim/catkin_ws/src/fcu_common/msg/Command.msg;/home/matt/ecen674trim/catkin_ws/src/fcu_common/msg/FW_State.msg;/home/matt/ecen674trim/catkin_ws/src/fcu_common/msg/FW_Controller_Commands.msg;/home/matt/ecen674trim/catkin_ws/src/fcu_common/msg/FW_Current_Path.msg;/home/matt/ecen674trim/catkin_ws/src/fcu_common/msg/FW_Waypoint.msg")
+set(fcu_common_SERVICE_FILES "")

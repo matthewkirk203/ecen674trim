@@ -237,7 +237,7 @@ def residuals(p,y,x):
     alpha,beta,phi = p
     Va, R, gamma = x
     fx,xtrim,utrim = get_fx(alpha,beta,phi,Va,R,gamma)
-    err = y - fx
+    err = y[2:] - fx[2:]
     # print('err',err)
     return err
 

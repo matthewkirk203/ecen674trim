@@ -12,12 +12,12 @@ def getSigma(alpha):
     return sigma
 
 def getLiftModelCoeff(alpha,sigma): 
-    C_L =  (1-sigma)*(P.C_L_0 + P.C_L_alpha*alpha) + sigma*(2*np.sign(alpha)*np.sin(alpha)**2*np.cos(alpha))
+    C_L =  (1-sigma)*(P.C_L_0 + P.C_L_alpha*alpha) + sigma*(2.0*np.sign(alpha)*np.sin(alpha)**2.0*np.cos(alpha))
     return C_L
 
 def getDragModelCoeff(alpha): # I have verified this function
-    AR = P.b**2/P.S
-    C_D =P.C_D_p + (P.C_L_0 + P.C_L_alpha*alpha)**2/(np.pi*P.e*AR)
+    AR = P.b**2.0/P.S
+    C_D =P.C_D_p + (P.C_L_0 + P.C_L_alpha*alpha)**2.0/(np.pi*P.e*AR)
     return C_D
 
 
@@ -58,18 +58,18 @@ def getAngularRates(phi,theta,Va,R):
 
 def getElevator(alpha,p,q,r,Va): 
     # The code is broken down into several steps to increase readability
-    temp1 = (P.Jxz*(p**2 - r**2) + (P.Jx - P.Jz)*p*r)/(1/2*P.rho*Va**2*P.c*P.S)
-    temp2 = temp1 - P.C_m_0 - P.C_m_alpha*alpha - P.C_m_q*(P.c*q/(2*Va))
+    temp1 = (P.Jxz*(p**2.0 - r**2.0) + (P.Jx - P.Jz)*p*r)/(1.0/2.0*P.rho*Va**2.0*P.c*P.S)
+    temp2 = temp1 - P.C_m_0 - P.C_m_alpha*alpha - P.C_m_q*(P.c*q/(2.0*Va))
 
     delta_e = temp2/P.C_m_delta_e
     return delta_e
 
 def getThrottle(u,v,w,p,q,r,Va,theta,C_X,C_X_q,C_X_delta_e,delta_e): 
     # The code is broken down into several steps to increase readability
-    temp1 = 2*P.m*(-r*v + q*w + P.g*np.sin(theta))
-    temp2 = -P.rho*(Va)**2*P.S*(C_X + C_X_q*P.c*q/(2*Va) + C_X_delta_e*delta_e)
-    temp3 = (temp1 + temp2)/(P.rho*P.Sprop*P.Cprop*P.kmotor**2)
-    temp4 = Va**2/P.kmotor**2
+    temp1 = 2.0*P.m*(-r*v + q*w + P.g*np.sin(theta))
+    temp2 = -P.rho*(Va)**2.0*P.S*(C_X + C_X_q*P.c*q/(2.0*Va) + C_X_delta_e*delta_e)
+    temp3 = (temp1 + temp2)/(P.rho*P.Sprop*P.Cprop*P.kmotor**2.0)
+    temp4 = Va**2.0/P.kmotor**2.0
     delta_t = np.sqrt(temp3 + temp4)
     return delta_t
 
@@ -79,12 +79,12 @@ def getAileronAndRudder(p,q,r,Va,beta):
     matrix1 = linalg.inv(matrix1)
 
 
-    temp1 = (-P.Gamma1*p*q + P.Gamma2*q*r)/(0.5*P.rho*Va**2*P.S*P.b)
-    temp2 = P.C_p_p*(P.b*p/(2*Va))
-    temp3 = P.C_p_r*(P.b*r/(2*Va))
-    temp4 = (-P.Gamma7*p*q + P.Gamma1*q*r)/(0.5*P.rho*Va**2*P.S*P.b)
-    temp5 = P.C_r_p*(P.b*p/(2*Va))
-    temp6 = P.C_r_r*(P.b*r/(2*Va))
+    temp1 = (-P.Gamma1*p*q + P.Gamma2*q*r)/(0.5*P.rho*Va**2.0*P.S*P.b)
+    temp2 = P.C_p_p*(P.b*p/(2.0*Va))
+    temp3 = P.C_p_r*(P.b*r/(2.0*Va))
+    temp4 = (-P.Gamma7*p*q + P.Gamma1*q*r)/(0.5*P.rho*Va**2.0*P.S*P.b)
+    temp5 = P.C_r_p*(P.b*p/(2.0*Va))
+    temp6 = P.C_r_r*(P.b*r/(2.0*Va))
 
     matrix2 = np.matrix([[temp1 - P.C_p_0 - P.C_p_beta*beta - temp2 - temp3],
         [temp4 - P.C_r_0 - P.C_r_beta*beta - temp5 - temp6]])
@@ -120,7 +120,7 @@ def get_fx(alpha,beta,phi,Va,R,gamma):
 
     C_X, C_X_q, C_X_delta_e, C_Z, C_Z_q, C_Z_delta_e,u,v,w,theta,p,q,r,delta_e,delta_t,delta_a,delta_r = get_xtrim_utrim(alpha,beta,phi,Va,R,gamma)
 
-    psi = 0
+    psi = 0.0
 
 
     cos_phi = np.cos(phi)
@@ -130,7 +130,7 @@ def get_fx(alpha,beta,phi,Va,R,gamma):
     sin_theta = np.sin(theta)
     sin_psi = np.sin(psi)
 
-    temp1 = P.rho*Va**2*P.S/(2*P.m)
+    temp1 = P.rho*Va**2.0*P.S/(2.0*P.m)
 
     pndot = (cos_theta*cos_psi*u + (sin_phi*sin_theta*cos_psi - 
         cos_phi*sin_psi)*v + (cos_phi*sin_theta*cos_psi + 
@@ -144,15 +144,15 @@ def get_fx(alpha,beta,phi,Va,R,gamma):
         w*cos_phi*cos_theta)
 
     udot = (r*v - q*w - P.g*sin_theta + 
-        temp1*(C_X + C_X_q*P.c*q/(2*Va) + C_X_delta_e*delta_e) +
-        P.rho*P.Sprop*P.Cprop/(2*P.m)*((P.kmotor*delta_t)**2 - Va**2))
+        temp1*(C_X + C_X_q*P.c*q/(2.0*Va) + C_X_delta_e*delta_e) +
+        P.rho*P.Sprop*P.Cprop/(2.0*P.m)*((P.kmotor*delta_t)**2.0 - Va**2.0))
 
     vdot = (p*w - r*u + P.g*cos_theta*sin_phi + temp1*
-        (P.C_Y_0 + P.C_Y_beta*beta + P.C_Y_p*P.b*p/(2*Va) + P.C_Y_r*P.b*r/(2*Va) +
+        (P.C_Y_0 + P.C_Y_beta*beta + P.C_Y_p*P.b*p/(2.0*Va) + P.C_Y_r*P.b*r/(2.0*Va) +
          P.C_Y_delta_a*delta_a + P.C_Y_delta_r*delta_r))
 
     wdot = (q*u - p*v + P.g*cos_theta*cos_phi + temp1*(C_Z + 
-        C_Z_q*P.c*q/(2*Va) + C_Z_delta_e*delta_e))
+        C_Z_q*P.c*q/(2.0*Va) + C_Z_delta_e*delta_e))
 
     phidot = p + q*sin_phi*np.tan(theta) + r*cos_phi*np.tan(theta)
 
@@ -160,22 +160,22 @@ def get_fx(alpha,beta,phi,Va,R,gamma):
 
     psidot = q*sin_phi/cos_theta + r*cos_phi/cos_theta
 
-    pdot = (P.Gamma1*p*q - P.Gamma2*q*r + (1/2)*P.rho*Va**2*P.S*P.b*
-        (P.C_p_0 + P.C_p_beta*beta + P.C_p_p*P.b*p/(2*Va) + P.C_p_r*P.b*r/(2*Va) +
+    pdot = (P.Gamma1*p*q - P.Gamma2*q*r + (1.0/2.0)*P.rho*Va**2.0*P.S*P.b*
+        (P.C_p_0 + P.C_p_beta*beta + P.C_p_p*P.b*p/(2.0*Va) + P.C_p_r*P.b*r/(2.0*Va) +
          P.C_p_delta_a*delta_a + P.C_p_delta_r*delta_r))
 
-    qdot = (P.Gamma5*p*r - P.Gamma6*(p**2 - r**2) + P.rho*Va**2*P.S*P.c/(2*P.Jy)*
-        (P.C_m_0 + P.C_m_alpha*alpha + P.C_m_q*P.c*q/(2*Va) + P.C_m_delta_e*delta_e))
+    qdot = (P.Gamma5*p*r - P.Gamma6*(p**2.0 - r**2.0) + P.rho*Va**2.0*P.S*P.c/(2.0*P.Jy)*
+        (P.C_m_0 + P.C_m_alpha*alpha + P.C_m_q*P.c*q/(2.0*Va) + P.C_m_delta_e*delta_e))
 
-    rdot = (P.Gamma7*p*q - P.Gamma1*q*r + (1/2)*P.rho*Va**2*P.S*P.b*
-        (P.C_r_0 + P.C_r_beta*beta + P.C_r_p*P.b*p/(2*Va) + P.C_r_r*P.b*r/(2*Va) +
+    rdot = (P.Gamma7*p*q - P.Gamma1*q*r + (1.0/2.0)*P.rho*Va**2.0*P.S*P.b*
+        (P.C_r_0 + P.C_r_beta*beta + P.C_r_p*P.b*p/(2.0*Va) + P.C_r_r*P.b*r/(2.0*Va) +
         P.C_r_delta_a*delta_a + P.C_r_delta_r*delta_r))
 
  
     fx = np.array([pndot,pedot,hdot,udot,vdot,wdot,phidot,thetadot,psidot,pdot,qdot,rdot])
-    xtrim = np.array([0,                # pn
-                      0,                # pe
-                      0,                # pd
+    xtrim = np.array([0.0,                # pn
+                      0.0,                # pe
+                      0.0,                # pd
                       u,
                       v,
                       w,
@@ -243,20 +243,20 @@ def residuals(p,y,x):
 
 
 def ComputeTrim(Va,R,gamma):
-    xdotStar = np.array([0,                                 # pn dot
-                         0,                                 # pe dot
+    xdotStar = np.array([0.0,                                 # pn dot
+                         0.0,                                 # pe dot
                          Va*np.sin(gamma),        # h dot
-                         0,                                 # u dot
-                         0,                                 # v dot
-                         0,                                 # w dot
-                         0,                                 # phi dot
-                         0,                                 # theta dot
+                         0.0,                                 # u dot
+                         0.0,                                 # v dot
+                         0.0,                                 # w dot
+                         0.0,                                 # phi dot
+                         0.0,                                 # theta dot
                          Va/R*np.cos(gamma), # psi dot
-                         0,                                 # p dot
-                         0,                                 # q dot
-                         0])                                # r dot 
+                         0.0,                                 # p dot
+                         0.0,                                 # q dot
+                         0.0])                                # r dot 
 
-    p0 = [0,0,0]
+    p0 = [0.0,0.0,0.0]
     x = [Va,R,gamma]
 
     plsq = leastsq(residuals, p0, args=(xdotStar,x))

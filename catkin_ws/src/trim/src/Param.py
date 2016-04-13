@@ -7,7 +7,7 @@ g = 9.8              # gravity, m/s
 # Aerodynamic coefficients
 
 # Parameters
-m       = 25.0#13.5          # mass, kg
+m       = 13.5          # mass, kg
 Jx      = 0.8244        # Component of Inertia matrix, kg-m**2
 Jy      = 1.135         # Component of Inertia matrix, kg-m**2
 Jz      = 1.759         # Component of Inertia matrix, kg-m**2
@@ -72,7 +72,7 @@ Gamma3 = Jz/Gamma
 Gamma4 = Jxz/Gamma
 Gamma5 = (Jz-Jx)/Jy
 Gamma6 = Jxz/Jy
-Gamma7 = ((Jx-Jy)/Jx + Jxz**2.0)/Gamma
+Gamma7 = ((Jx-Jy)*Jx + Jxz**2.0)/Gamma
 Gamma8 = Jx/Gamma
 
 # Other Coefficients

@@ -70,6 +70,7 @@ def getThrottle(u,v,w,p,q,r,Va,theta,C_X,C_X_q,C_X_delta_e,delta_e):
     temp2 = -P.rho*(Va)**2.0*P.S*(C_X + C_X_q*P.c*q/(2.0*Va) + C_X_delta_e*delta_e)
     temp3 = (temp1 + temp2)/(P.rho*P.Sprop*P.Cprop*P.kmotor**2.0)
     temp4 = Va**2.0/P.kmotor**2.0
+    print(temp3+temp4)
     delta_t = np.sqrt(temp3 + temp4)
     return delta_t
 
@@ -120,6 +121,8 @@ def get_fx(alpha,beta,phi,Va,R,gamma):
 
     C_X, C_X_q, C_X_delta_e, C_Z, C_Z_q, C_Z_delta_e,u,v,w,theta,p,q,r,delta_e,delta_t,delta_a,delta_r = get_xtrim_utrim(alpha,beta,phi,Va,R,gamma)
 
+    
+
     psi = 0.0
 
 
@@ -159,10 +162,9 @@ def get_fx(alpha,beta,phi,Va,R,gamma):
     thetadot = q*cos_phi - r*sin_phi
 
     psidot = q*sin_phi/cos_theta + r*cos_phi/cos_theta
+    
 
-    pdot = (P.Gamma1*p*q - P.Gamma2*q*r + (1.0/2.0)*P.rho*Va**2.0*P.S*P.b*
-        (P.C_p_0 + P.C_p_beta*beta + P.C_p_p*P.b*p/(2.0*Va) + P.C_p_r*P.b*r/(2.0*Va) +
-         P.C_p_delta_a*delta_a + P.C_p_delta_r*delta_r))
+    pdot = (P.Gamma1*p*q - P.Gamma2*q*r + (1.0/2.0)*P.rho*Va**2.0*P.S*P.b*float(P.C_p_0 + P.C_p_beta*beta + P.C_p_p*P.b*p/(2.0*Va) + P.C_p_r*P.b*r/(2.0*Va) + P.C_p_delta_a*delta_a + P.C_p_delta_r*delta_r))
 
     qdot = (P.Gamma5*p*r - P.Gamma6*(p**2.0 - r**2.0) + P.rho*Va**2.0*P.S*P.c/(2.0*P.Jy)*
         (P.C_m_0 + P.C_m_alpha*alpha + P.C_m_q*P.c*q/(2.0*Va) + P.C_m_delta_e*delta_e))
@@ -260,7 +262,7 @@ def ComputeTrim(Va,R,gamma):
     x = [Va,R,gamma]
 
     plsq = leastsq(residuals, p0, args=(xdotStar,x))
-
+    print(plsq)
 
 
     alpha,beta,phi = plsq[0]
@@ -277,9 +279,11 @@ def ComputeTrim(Va,R,gamma):
 
 if __name__ == "__main__": 
    
-    Va = float(35)
-    gamma = float(15*np.pi/180)
+    Va = float(35.0)
+    gamma = float(10.0*np.pi/180)
 
-    R = float(200)
+    R = float('Inf')
     xtrim,utrim = ComputeTrim(Va,R,gamma)
+    # fx,xtrim,utrim = get_fx(1,1,1,Va,R,gamma)
+    # printValues(fx, xtrim, utrim,(np.array([1.0,1.0,1.0]),2))
     

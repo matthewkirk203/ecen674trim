@@ -5,28 +5,28 @@ import rospy
 from trim.srv import *
 import Trim
 
-def compute_trim_client(Va, gamma, R):
+def compute_trim_client(Va, R, gamma):
     rospy.wait_for_service('compute_trim')
     try:
         compute_trim = rospy.ServiceProxy('compute_trim', ComputeTrim)
-        resp1 = compute_trim(Va, gamma, R)
+        resp1 = compute_trim(Va, R, gamma)
         return resp1.x_trim,resp1.u_trim
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
 def usage():
-    return "%s [Va gamma R]"%sys.argv[0]
+    return "%s [Va R gamma]"%sys.argv[0]
 
 if __name__ == "__main__":
     if len(sys.argv) == 4:
         Va = float(sys.argv[1])
-        gamma = float(sys.argv[2])
-        R = float(sys.argv[3])
+        R = float(sys.argv[2])
+        gamma = float(sys.argv[3])
     else:
         print usage()
         sys.exit(1)
-    print "Requesting trim with Va: %s, gamma: %s, R: %s"%(Va, gamma, R)
-    x_trim, u_trim = compute_trim_client(Va, gamma, R)
+    print "Requesting trim with Va: %s, R: %s, gamma: %s"%(Va, R, gamma)
+    x_trim, u_trim = compute_trim_client(Va, R, gamma)
     print('\n\n x trim')
     print('pn',x_trim[0])
     print('pe',x_trim[1])

@@ -25,13 +25,13 @@ struct ComputeTrimRequest_
 
   ComputeTrimRequest_()
     : Va(0.0)
-    , gamma(0.0)
-    , R(0.0)  {
+    , R(0.0)
+    , gamma(0.0)  {
     }
   ComputeTrimRequest_(const ContainerAllocator& _alloc)
     : Va(0.0)
-    , gamma(0.0)
-    , R(0.0)  {
+    , R(0.0)
+    , gamma(0.0)  {
     }
 
 
@@ -39,11 +39,11 @@ struct ComputeTrimRequest_
    typedef double _Va_type;
   _Va_type Va;
 
-   typedef double _gamma_type;
-  _gamma_type gamma;
-
    typedef double _R_type;
   _R_type R;
+
+   typedef double _gamma_type;
+  _gamma_type gamma;
 
 
 
@@ -122,12 +122,12 @@ struct MD5Sum< ::trim::ComputeTrimRequest_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "808d6dad1d12679a9e05848ee2a620e6";
+    return "4fb6c2b8582af153642dba1ac2c6c4db";
   }
 
   static const char* value(const ::trim::ComputeTrimRequest_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x808d6dad1d12679aULL;
-  static const uint64_t static_value2 = 0x9e05848ee2a620e6ULL;
+  static const uint64_t static_value1 = 0x4fb6c2b8582af153ULL;
+  static const uint64_t static_value2 = 0x642dba1ac2c6c4dbULL;
 };
 
 template<class ContainerAllocator>
@@ -147,8 +147,8 @@ struct Definition< ::trim::ComputeTrimRequest_<ContainerAllocator> >
   static const char* value()
   {
     return "float64 Va\n\
-float64 gamma\n\
 float64 R\n\
+float64 gamma\n\
 ";
   }
 
@@ -168,8 +168,8 @@ namespace serialization
     template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
     {
       stream.next(m.Va);
-      stream.next(m.gamma);
       stream.next(m.R);
+      stream.next(m.gamma);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER;
@@ -190,10 +190,10 @@ struct Printer< ::trim::ComputeTrimRequest_<ContainerAllocator> >
   {
     s << indent << "Va: ";
     Printer<double>::stream(s, indent + "  ", v.Va);
-    s << indent << "gamma: ";
-    Printer<double>::stream(s, indent + "  ", v.gamma);
     s << indent << "R: ";
     Printer<double>::stream(s, indent + "  ", v.R);
+    s << indent << "gamma: ";
+    Printer<double>::stream(s, indent + "  ", v.gamma);
   }
 };
 

@@ -70,7 +70,7 @@ def getThrottle(u,v,w,p,q,r,Va,theta,C_X,C_X_q,C_X_delta_e,delta_e):
     temp2 = -P.rho*(Va)**2.0*P.S*(C_X + C_X_q*P.c*q/(2.0*Va) + C_X_delta_e*delta_e)
     temp3 = (temp1 + temp2)/(P.rho*P.Sprop*P.Cprop*P.kmotor**2.0)
     temp4 = Va**2.0/P.kmotor**2.0
-    print(temp3+temp4)
+    #print(temp3+temp4)
     delta_t = np.sqrt(temp3 + temp4)
     return delta_t
 
@@ -260,7 +260,7 @@ def ComputeTrim(Va,R,gamma):
 
     p0 = [0.0,0.0,0.0]
     x = [Va,R,gamma]
-
+    #print("x: ", x)
     plsq = leastsq(residuals, p0, args=(xdotStar,x))
     print(plsq)
 
@@ -272,7 +272,7 @@ def ComputeTrim(Va,R,gamma):
     fx,xtrim,utrim = get_fx(alpha,beta,phi,Va,R,gamma)
 
     printValues(fx,xtrim,utrim,plsq)
-    print('xdotstar', xdotStar)
+    #print('xdotstar', xdotStar)
 
     return xtrim,utrim
 
@@ -280,9 +280,8 @@ def ComputeTrim(Va,R,gamma):
 if __name__ == "__main__": 
    
     Va = float(35.0)
-    gamma = float(10.0*np.pi/180)
-
     R = float('Inf')
+    gamma = float(10.0*np.pi/180)
     xtrim,utrim = ComputeTrim(Va,R,gamma)
     # fx,xtrim,utrim = get_fx(1,1,1,Va,R,gamma)
     # printValues(fx, xtrim, utrim,(np.array([1.0,1.0,1.0]),2))

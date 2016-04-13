@@ -6,9 +6,9 @@ import Trim
 
 def compute_trim(req):
 	Va = float(req.Va)
-	gamma = float(req.gamma)
 	R = float(req.R)
-	return Trim.ComputeTrim(Va,gamma,R)
+	gamma = float(req.gamma)
+	return Trim.ComputeTrim(Va,R,gamma)
 
 def compute_trim_server():
     rospy.init_node('compute_trim_server')

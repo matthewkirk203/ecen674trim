@@ -40,7 +40,7 @@ template<>
 struct MD5Sum< ::trim::ComputeTrim > {
   static const char* value()
   {
-    return "d00a817e9be7d657a0cb7e630d53cf0e";
+    return "7777883b607700a320089ca7a9d2af0e";
   }
 
   static const char* value(const ::trim::ComputeTrim&) { return value(); }

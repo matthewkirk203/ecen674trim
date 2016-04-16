@@ -12,14 +12,14 @@
     :initarg :Va
     :type cl:float
     :initform 0.0)
-   (gamma
-    :reader gamma
-    :initarg :gamma
-    :type cl:float
-    :initform 0.0)
    (R
     :reader R
     :initarg :R
+    :type cl:float
+    :initform 0.0)
+   (gamma
+    :reader gamma
+    :initarg :gamma
     :type cl:float
     :initform 0.0))
 )
@@ -37,15 +37,15 @@
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader trim-srv:Va-val is deprecated.  Use trim-srv:Va instead.")
   (Va m))
 
-(cl:ensure-generic-function 'gamma-val :lambda-list '(m))
-(cl:defmethod gamma-val ((m <ComputeTrim-request>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader trim-srv:gamma-val is deprecated.  Use trim-srv:gamma instead.")
-  (gamma m))
-
 (cl:ensure-generic-function 'R-val :lambda-list '(m))
 (cl:defmethod R-val ((m <ComputeTrim-request>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader trim-srv:R-val is deprecated.  Use trim-srv:R instead.")
   (R m))
+
+(cl:ensure-generic-function 'gamma-val :lambda-list '(m))
+(cl:defmethod gamma-val ((m <ComputeTrim-request>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader trim-srv:gamma-val is deprecated.  Use trim-srv:gamma instead.")
+  (gamma m))
 (cl:defmethod roslisp-msg-protocol:serialize ((msg <ComputeTrim-request>) ostream)
   "Serializes a message object of type '<ComputeTrim-request>"
   (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'Va))))
@@ -57,7 +57,7 @@
     (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
-  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'gamma))))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'R))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
@@ -66,7 +66,7 @@
     (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream))
-  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'R))))
+  (cl:let ((bits (roslisp-utils:encode-double-float-bits (cl:slot-value msg 'gamma))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
@@ -97,7 +97,7 @@
       (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
-    (cl:setf (cl:slot-value msg 'gamma) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:setf (cl:slot-value msg 'R) (roslisp-utils:decode-double-float-bits bits)))
     (cl:let ((bits 0))
       (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
@@ -107,7 +107,7 @@
       (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
-    (cl:setf (cl:slot-value msg 'R) (roslisp-utils:decode-double-float-bits bits)))
+    (cl:setf (cl:slot-value msg 'gamma) (roslisp-utils:decode-double-float-bits bits)))
   msg
 )
 (cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<ComputeTrim-request>)))
@@ -118,16 +118,16 @@
   "trim/ComputeTrimRequest")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<ComputeTrim-request>)))
   "Returns md5sum for a message object of type '<ComputeTrim-request>"
-  "d00a817e9be7d657a0cb7e630d53cf0e")
+  "7777883b607700a320089ca7a9d2af0e")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'ComputeTrim-request)))
   "Returns md5sum for a message object of type 'ComputeTrim-request"
-  "d00a817e9be7d657a0cb7e630d53cf0e")
+  "7777883b607700a320089ca7a9d2af0e")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<ComputeTrim-request>)))
   "Returns full string definition for message of type '<ComputeTrim-request>"
-  (cl:format cl:nil "float64 Va~%float64 gamma~%float64 R~%~%~%"))
+  (cl:format cl:nil "float64 Va~%float64 R~%float64 gamma~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'ComputeTrim-request)))
   "Returns full string definition for message of type 'ComputeTrim-request"
-  (cl:format cl:nil "float64 Va~%float64 gamma~%float64 R~%~%~%"))
+  (cl:format cl:nil "float64 Va~%float64 R~%float64 gamma~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <ComputeTrim-request>))
   (cl:+ 0
      8
@@ -138,8 +138,8 @@
   "Converts a ROS message object to a list"
   (cl:list 'ComputeTrim-request
     (cl:cons ':Va (Va msg))
-    (cl:cons ':gamma (gamma msg))
     (cl:cons ':R (R msg))
+    (cl:cons ':gamma (gamma msg))
 ))
 ;//! \htmlinclude ComputeTrim-response.msg.html
 
@@ -234,10 +234,10 @@
   "trim/ComputeTrimResponse")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<ComputeTrim-response>)))
   "Returns md5sum for a message object of type '<ComputeTrim-response>"
-  "d00a817e9be7d657a0cb7e630d53cf0e")
+  "7777883b607700a320089ca7a9d2af0e")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'ComputeTrim-response)))
   "Returns md5sum for a message object of type 'ComputeTrim-response"
-  "d00a817e9be7d657a0cb7e630d53cf0e")
+  "7777883b607700a320089ca7a9d2af0e")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<ComputeTrim-response>)))
   "Returns full string definition for message of type '<ComputeTrim-response>"
   (cl:format cl:nil "float64[12] x_trim~%float64[4] u_trim~%~%~%"))

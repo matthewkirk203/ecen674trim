@@ -270,7 +270,7 @@ def ComputeTrim(Va,R,gamma):
                          0.0,                                 # q dot
                          0.0])                                # r dot 
 
-    p0 = [0,0.0,0.0] # initial guess of alpha, beta, and phi
+    p0 = [0.0,0.0,0.0] # initial guess of alpha, beta, and phi
     x = [Va,R,gamma] # Desired Va, R, and gamma
 
     plsq = leastsq(residuals, p0, args=(xdotStar,x)) # Minimize funciton, returns the optimal

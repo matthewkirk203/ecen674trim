@@ -3,7 +3,10 @@ from numpy import linalg
 import Param as P
 from scipy.optimize import leastsq
 
+# This code is based off the algorithms provided in the book "Small Unmanned Aircraft" by Randal W. Beard and Timothy W. McLain on 
+# pages 278 - 284
 
+# coefficient used to model the aerodynamics of the plane as a curved or flat object
 def getSigma(alpha): 
     # The code is broken down into several steps to increase readability
     numerator = 1+np.exp(-P.M*(alpha-P.alpha_0))+np.exp(P.M*(alpha+P.alpha_0))
@@ -11,22 +14,24 @@ def getSigma(alpha):
     sigma = numerator/den
     return sigma
 
+# Returns the lift model coefficient
 def getLiftModelCoeff(alpha,sigma): 
     C_L =  (1-sigma)*(P.C_L_0 + P.C_L_alpha*alpha) + sigma*(2.0*np.sign(alpha)*np.sin(alpha)**2.0*np.cos(alpha))
     return C_L
 
-def getDragModelCoeff(alpha): # I have verified this function
+# Returns the drage model coefficient
+def getDragModelCoeff(alpha): 
     AR = P.b**2.0/P.S
     C_D =P.C_D_p + (P.C_L_0 + P.C_L_alpha*alpha)**2.0/(np.pi*P.e*AR)
     return C_D
 
-
+# Computes the lift coefficients 
 def getLiftCoeff(alpha): 
 
     
-    sigma = getSigma(alpha)   # Compute sigma    
+    sigma = getSigma(alpha)              # Compute sigma    
     C_L = getLiftModelCoeff(alpha,sigma) # Compute Lift model Coeff     
-    C_D = getDragModelCoeff(alpha) # Compute drag model Coeff
+    C_D = getDragModelCoeff(alpha)       # Compute drag model Coeff
 
     C_X =           -C_D*np.cos(alpha)  +          C_L*np.sin(alpha)
     C_X_q =         -P.C_D_q*np.cos(alpha) +            P.C_L_q*np.sin(alpha)
@@ -37,16 +42,19 @@ def getLiftCoeff(alpha):
 
     return C_X, C_X_q, C_X_delta_e, C_Z, C_Z_q, C_Z_delta_e
 
+# Computes the body frame velocities
 def getBodyFrameVelocities(alpha, beta,Va): 
     u = Va*np.cos(alpha)*np.cos(beta)
     v = Va*np.sin(beta)
     w = Va*np.sin(alpha)*np.cos(beta)
     return u, v, w
 
+# Returns the pitch angel
 def getPitchAngle(alpha,gamma):                  
     theta = alpha + gamma
     return theta
 
+# Returns the angular rates 
 def getAngularRates(phi,theta,Va,R):                 
 
     p = -Va/R*np.sin(theta)
@@ -55,7 +63,7 @@ def getAngularRates(phi,theta,Va,R):
     return p,q,r
 
 
-
+# Returns the elevator coefficient
 def getElevator(alpha,p,q,r,Va): 
     # The code is broken down into several steps to increase readability
     temp1 = (P.Jxz*(p**2.0 - r**2.0) + (P.Jx - P.Jz)*p*r)/(1.0/2.0*P.rho*Va**2.0*P.c*P.S)
@@ -64,16 +72,17 @@ def getElevator(alpha,p,q,r,Va):
     delta_e = temp2/P.C_m_delta_e
     return delta_e
 
+# Returns the throttle coefficient
 def getThrottle(u,v,w,p,q,r,Va,theta,C_X,C_X_q,C_X_delta_e,delta_e): 
     # The code is broken down into several steps to increase readability
     temp1 = 2.0*P.m*(-r*v + q*w + P.g*np.sin(theta))
     temp2 = -P.rho*(Va)**2.0*P.S*(C_X + C_X_q*P.c*q/(2.0*Va) + C_X_delta_e*delta_e)
     temp3 = (temp1 + temp2)/(P.rho*P.Sprop*P.Cprop*P.kmotor**2.0)
     temp4 = Va**2.0/P.kmotor**2.0
-    print(temp3+temp4)
     delta_t = np.sqrt(temp3 + temp4)
     return delta_t
 
+# Returns the aileron and rudder coefficients
 def getAileronAndRudder(p,q,r,Va,beta): 
     # The code is broken down into several steps to increase readability
     matrix1 = np.matrix([[P.C_p_delta_a, P.C_p_delta_r], [P.C_r_delta_a, P.C_r_delta_r]])
@@ -100,7 +109,7 @@ def getAileronAndRudder(p,q,r,Va,beta):
 
 
 
-
+# Returns xtrim and utrim
 def get_xtrim_utrim(alpha,beta,phi,Va,R,gamma):
 
     C_X, C_X_q, C_X_delta_e, C_Z, C_Z_q, C_Z_delta_e = getLiftCoeff(alpha)
@@ -115,7 +124,7 @@ def get_xtrim_utrim(alpha,beta,phi,Va,R,gamma):
 
 
 
-
+# Returns the state derivatives using x_trim and u_trim
 def get_fx(alpha,beta,phi,Va,R,gamma):
         
 
@@ -213,9 +222,9 @@ def printValues(fx, xtrim, utrim,plsq):
 
     print('\n\n u trim')
     print('delta e', utrim[0])
-    print('delta t', utrim[1])
     print('delta a', utrim[2])
     print('delta r', utrim[3])
+    print('delta t', utrim[1])
 
     print('\n\n xhatdot')
     print('pndot', fx[0])
@@ -234,17 +243,20 @@ def printValues(fx, xtrim, utrim,plsq):
     print('beta ', beta)
     print('alpha ', alpha)
 
-
+# Returns the error between desired xdot trim conditions and minimized xdot trim conditions
 def residuals(p,y,x):
-    alpha,beta,phi = p
-    Va, R, gamma = x
-    fx,xtrim,utrim = get_fx(alpha,beta,phi,Va,R,gamma)
-    err = y[2:] - fx[2:]
+    alpha,beta,phi = p  # Current alpha,beta,phi
+    Va, R, gamma = x    # Commanded action
+    fx,xtrim,utrim = get_fx(alpha,beta,phi,Va,R,gamma) # Compute trim values based on the current 
+                                                       # alpha, beta, and phi
+    #err = y[2:] - fx[2:]
+    err = y[1:] - fx[1:]  # Calcualtes the error between the desired xhot hat and the optimized xdot hat
     # print('err',err)
     return err
 
-
+# Computes the minimized trim conditions iterativly 
 def ComputeTrim(Va,R,gamma):
+    # Desired xdot trim conditions
     xdotStar = np.array([0.0,                                 # pn dot
                          0.0,                                 # pe dot
                          Va*np.sin(gamma),        # h dot
@@ -258,17 +270,18 @@ def ComputeTrim(Va,R,gamma):
                          0.0,                                 # q dot
                          0.0])                                # r dot 
 
-    p0 = [0.0,0.0,0.0]
-    x = [Va,R,gamma]
+    p0 = [0,0.0,0.0] # initial guess of alpha, beta, and phi
+    x = [Va,R,gamma] # Desired Va, R, and gamma
 
-    plsq = leastsq(residuals, p0, args=(xdotStar,x))
+    plsq = leastsq(residuals, p0, args=(xdotStar,x)) # Minimize funciton, returns the optimal
+                                                     # alpha, beta, and phi
     print(plsq)
 
 
     alpha,beta,phi = plsq[0]
     #print('phi', phi)
     
-
+    # Gets the trim conditions based on the optimal alpha, beta, and phi
     fx,xtrim,utrim = get_fx(alpha,beta,phi,Va,R,gamma)
 
     printValues(fx,xtrim,utrim,plsq)
@@ -280,9 +293,9 @@ def ComputeTrim(Va,R,gamma):
 if __name__ == "__main__": 
    
     Va = float(35.0)
-    gamma = float(10.0*np.pi/180)
+    gamma = float(10*np.pi/180)
 
-    R = float('Inf')
+    R = float(200)
     xtrim,utrim = ComputeTrim(Va,R,gamma)
     # fx,xtrim,utrim = get_fx(1,1,1,Va,R,gamma)
     # printValues(fx, xtrim, utrim,(np.array([1.0,1.0,1.0]),2))

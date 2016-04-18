@@ -41,6 +41,10 @@
 
   <node name="autopilot" pkg="ros_plane" type="ros_plane_controller" >
     <!-- <remap from="command" to="autopilot_command"/> -->
+    <param name="TRIM_E" value="-.05"/>
+    <param name="TRIM_A" value="0"/>
+    <param name="TRIM_R" value="0"/>
+    <param name="TRIM_T" value=".398"/>
     <remap from="state" to="/junker/truth"/> <!--  -->
   </node>
 
